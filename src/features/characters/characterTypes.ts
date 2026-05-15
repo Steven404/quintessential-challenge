@@ -22,7 +22,7 @@ export type Character = {
   created: string;
 };
 
-export type CharacterResponse = {
+export type CharactersResponse = {
   info: {
     count: number;
     pages: number;

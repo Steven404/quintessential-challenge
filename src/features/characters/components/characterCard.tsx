@@ -25,8 +25,8 @@ export function CharacterCard({ character }: CharacterCardProps) {
 
   return (
     <TouchableOpacity
-      className="m-2 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
-      onPress={() => router.push(`/character/${character.id}`)}
+      className="w-[45%] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      onPress={() => router.navigate(`/character/${character.id}`)}
     >
       <Image
         source={{ uri: character.image }}
