@@ -1,3 +1,4 @@
+import ErrorView from '@/src/components/errorView';
 import { useCharacterReq } from '@/src/features/characters/api/characterRequests';
 import { useFavoritesContext } from '@/src/hooks/favoritesContext';
 import Feather from '@expo/vector-icons/Feather';
@@ -19,7 +20,12 @@ export default function CharacterScreen() {
   const router = useRouter();
   const { addFavorite, removeFavorite, favorites } = useFavoritesContext();
 
-  const { data: character, isLoading, error } = useCharacterReq(id as string);
+  const {
+    data: character,
+    isLoading,
+    isError,
+    error,
+  } = useCharacterReq(id as string);
 
   if (isLoading) {
     return (
@@ -34,18 +40,18 @@ export default function CharacterScreen() {
     );
   }
 
-  if (error || !character) {
+  if (isError) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-white dark:bg-gray-900">
-        <Text className="text-lg text-red-500">Failed to load character.</Text>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          className="mt-4 rounded-lg bg-blue-500 px-4 py-2"
-        >
-          <Text className="font-medium text-white">Go Back</Text>
-        </TouchableOpacity>
-      </SafeAreaView>
+      <ErrorView
+        title="Failed to load character."
+        message={error?.message || 'Please try again later.'}
+        goBack={true}
+      />
     );
+  }
+
+  if (!character) {
+    return <ErrorView message="Character not found" />;
   }
 
   const isFavorite = favorites.some((f) => f.id === character.id);

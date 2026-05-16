@@ -1,7 +1,8 @@
+import ErrorView from '@/src/components/errorView';
 import { useCharactersReq } from '@/src/features/characters/api/characterRequests';
 import CharacterFlatList from '@/src/features/characters/components/characterFlatList';
 import { useRef } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 
 export default function Index() {
   const fetchNextPageTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -18,25 +19,17 @@ export default function Index() {
 
   if (isError) {
     return (
-      <View className="flex-1 items-center justify-center px-6">
-        <Text className="text-center text-lg text-red-500">
-          Failed to load characters.
-        </Text>
-        <Text className="mt-2 text-center text-gray-500">
-          {error && error.message ? error.message : 'Please try again later.'}
-        </Text>
-      </View>
+      <ErrorView
+        title="Failed to load characters."
+        message={error?.message || 'Please try again later.'}
+      />
     );
   }
 
   const characters = data?.pages.flatMap((page) => page.results); // page.results is an array of arrays, so we need to flatten it
 
   if (!characters?.length) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <Text>No characters found</Text>
-      </View>
-    );
+    return <ErrorView message="No characters found" />;
   }
 
   const handleOnEndReached = () => {
