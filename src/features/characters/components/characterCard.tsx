@@ -1,8 +1,8 @@
 import { useFavoritesContext } from '@/src/hooks/favoritesContext';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { wigglyConfigCard } from '@/src/utils/animationConfigs';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -11,6 +11,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { Character } from '../characterTypes';
+import CharacterHeartPress from './characterHeartPress';
 
 type CharacterCardProps = {
   character: Character;
@@ -38,22 +39,12 @@ export function CharacterCard({
     // opacity: pressAnim.value ** 4,
   }));
 
-  const isFavorite = favorites.some((f) => f.id === character.id);
-
-  const handleFavorite = () => {
-    if (isFavorite) {
-      removeFavorite(character);
-    } else {
-      addFavorite(character);
-    }
-  };
-
   const handlePressIn = () => {
-    pressAnim.value = withSpring(0.94, { duration: 100 });
+    pressAnim.value = withSpring(0.94, wigglyConfigCard);
   };
 
   const handlePressOut = () => {
-    pressAnim.value = withSpring(1, { duration: 100 });
+    pressAnim.value = withSpring(1, wigglyConfigCard);
   };
 
   const handlePress = () => {
@@ -79,16 +70,10 @@ export function CharacterCard({
           resizeMode="cover"
         />
 
-        <TouchableOpacity
-          className="absolute right-3 top-3 rounded-full bg-white p-2 shadow-sm"
-          onPress={handleFavorite}
-        >
-          {isFavorite ? (
-            <FontAwesome name="heart" size={24} color="red" />
-          ) : (
-            <FontAwesome name="heart-o" size={24} color="black" />
-          )}
-        </TouchableOpacity>
+        <CharacterHeartPress
+          character={character}
+          wrapperClassName="absolute right-3 top-3 rounded-full bg-white p-2 shadow-sm"
+        />
 
         <View className="p-4">
           <Text

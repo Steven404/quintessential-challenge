@@ -1,8 +1,8 @@
 import ErrorView from '@/src/components/errorView';
 import { useCharacterReq } from '@/src/features/characters/api/characterRequests';
+import CharacterHeartPress from '@/src/features/characters/components/characterHeartPress';
 import { useFavoritesContext } from '@/src/hooks/favoritesContext';
 import Feather from '@expo/vector-icons/Feather';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import {
@@ -54,16 +54,6 @@ export default function CharacterScreen() {
     return <ErrorView message="Character not found" />;
   }
 
-  const isFavorite = favorites.some((f) => f.id === character.id);
-
-  const handleFavorite = () => {
-    if (isFavorite) {
-      removeFavorite(character);
-    } else {
-      addFavorite(character);
-    }
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Alive':
@@ -92,16 +82,11 @@ export default function CharacterScreen() {
             <Feather name="chevron-left" size={28} color="white" />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            className="absolute bottom-[-28px] right-6 rounded-full bg-white p-4 shadow-lg dark:bg-gray-800"
-            onPress={handleFavorite}
-          >
-            {isFavorite ? (
-              <FontAwesome name="heart" size={28} color="red" />
-            ) : (
-              <FontAwesome name="heart-o" size={28} color="black" />
-            )}
-          </TouchableOpacity>
+          <CharacterHeartPress
+            character={character}
+            wrapperClassName="absolute bottom-[-28px] right-6 rounded-full bg-white p-4 shadow-lg dark:bg-gray-800"
+            size={28}
+          />
         </View>
 
         <View className="px-6 pb-12 pt-10">
