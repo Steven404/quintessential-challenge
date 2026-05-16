@@ -23,7 +23,7 @@ export function CharacterCard({
   const isFavorite = favorites.some((f) => f.id === character.id);
 
   const enteringAnimation = isInitialRender
-    ? FadeIn.delay(index * 150)
+    ? FadeIn.delay((index % 20) * 150) // added modulo 20 to compensate for useInfiniteQuery usage
     : FadeIn;
   // const exitingAnimation = FadeOut.duration(500).delay(index * 150); not sure if I want this after all
 
@@ -37,7 +37,7 @@ export function CharacterCard({
 
   return (
     <Animated.View
-      className="w-[48.5%] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      className="max-w-[48.5%] flex-1 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
       entering={enteringAnimation}
       // exiting={exitingAnimation}
       exiting={FadeOut}

@@ -1,4 +1,4 @@
-import CharacterFlatList from '@/src/components/characterFlatList';
+import CharacterFlatList from '@/src/features/characters/components/characterFlatList';
 import { useFavoritesContext } from '@/src/hooks/favoritesContext';
 import { Text, View } from 'react-native';
 import Animated, { LinearTransition } from 'react-native-reanimated';
@@ -15,7 +15,7 @@ export default function Index() {
   }
 
   return (
-    <Animated.View layout={LinearTransition} className="flex-1 px-[2.5%]">
+    <Animated.View layout={LinearTransition} className="flex-1">
       <CharacterFlatList characters={favorites} />
     </Animated.View>
   );
