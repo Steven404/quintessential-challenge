@@ -22,6 +22,7 @@ export const FavoritesProvider = ({
   children: React.ReactNode;
 }) => {
   const [favorites, setFavorites] = useState<Character[]>([]);
+  const [areFavoritesLoaded, setAreFavoritesLoaded] = useState(false);
 
   const addFavorite = (character: Character) => {
     if (favorites.some((f) => f.id === character.id)) {
@@ -36,8 +37,24 @@ export const FavoritesProvider = ({
   };
 
   useEffect(() => {
+    const fetchFavorites = async () => {
+      const storedFavorites = await AsyncStorage.getItem('favorites');
+      if (storedFavorites) {
+        setFavorites(JSON.parse(storedFavorites));
+      }
+      setAreFavoritesLoaded(true);
+    };
+
+    fetchFavorites();
+  }, []);
+
+  useEffect(() => {
+    if (!areFavoritesLoaded) {
+      return;
+    }
+
     AsyncStorage.setItem('favorites', JSON.stringify(favorites));
-  }, [favorites]);
+  }, [favorites, areFavoritesLoaded]);
 
   return (
     <FavoritesContext.Provider
