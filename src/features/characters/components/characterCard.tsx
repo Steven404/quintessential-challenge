@@ -2,8 +2,14 @@ import { useFavoritesContext } from '@/src/hooks/favoritesContext';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  FadeIn,
+  FadeOut,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import { Character } from '../characterTypes';
 
 type CharacterCardProps = {
@@ -20,12 +26,19 @@ export function CharacterCard({
   const { addFavorite, removeFavorite, favorites } = useFavoritesContext();
   const router = useRouter();
 
-  const isFavorite = favorites.some((f) => f.id === character.id);
-
   const enteringAnimation = isInitialRender
     ? FadeIn.delay((index % 20) * 150) // added modulo 20 to compensate for useInfiniteQuery usage
     : FadeIn;
   // const exitingAnimation = FadeOut.duration(500).delay(index * 150); not sure if I want this after all
+
+  const pressAnim = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pressAnim.value }],
+    // opacity: pressAnim.value ** 4,
+  }));
+
+  const isFavorite = favorites.some((f) => f.id === character.id);
 
   const handleFavorite = () => {
     if (isFavorite) {
@@ -35,15 +48,30 @@ export function CharacterCard({
     }
   };
 
+  const handlePressIn = () => {
+    pressAnim.value = withSpring(0.94, { duration: 100 });
+  };
+
+  const handlePressOut = () => {
+    pressAnim.value = withSpring(1, { duration: 100 });
+  };
+
+  const handlePress = () => {
+    router.navigate(`/character/${character.id}`);
+  };
+
   return (
     <Animated.View
+      style={animatedStyle}
       className="max-w-[48.5%] flex-1 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
       entering={enteringAnimation}
       // exiting={exitingAnimation}
       exiting={FadeOut}
     >
-      <TouchableOpacity
-        onPress={() => router.navigate(`/character/${character.id}`)}
+      <Pressable
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onPress={handlePress}
       >
         <Image
           source={{ uri: character.image }}
@@ -92,7 +120,7 @@ export function CharacterCard({
             </Text>
           </View>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </Animated.View>
   );
 }
