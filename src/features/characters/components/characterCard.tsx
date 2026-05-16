@@ -8,13 +8,24 @@ import { Character } from '../characterTypes';
 
 type CharacterCardProps = {
   character: Character;
+  index: number;
+  isInitialRender?: boolean;
 };
 
-export function CharacterCard({ character }: CharacterCardProps) {
+export function CharacterCard({
+  character,
+  index,
+  isInitialRender = false,
+}: CharacterCardProps) {
   const { addFavorite, removeFavorite, favorites } = useFavoritesContext();
   const router = useRouter();
 
   const isFavorite = favorites.some((f) => f.id === character.id);
+
+  const enteringAnimation = isInitialRender
+    ? FadeIn.delay(index * 150)
+    : FadeIn;
+  // const exitingAnimation = FadeOut.duration(500).delay(index * 150); not sure if I want this after all
 
   const handleFavorite = () => {
     if (isFavorite) {
@@ -27,8 +38,9 @@ export function CharacterCard({ character }: CharacterCardProps) {
   return (
     <Animated.View
       className="w-[48.5%] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
-      entering={FadeIn.duration(500)}
-      exiting={FadeOut.duration(500)}
+      entering={enteringAnimation}
+      // exiting={exitingAnimation}
+      exiting={FadeOut}
     >
       <TouchableOpacity
         onPress={() => router.navigate(`/character/${character.id}`)}
