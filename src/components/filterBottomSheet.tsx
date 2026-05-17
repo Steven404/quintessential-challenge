@@ -3,7 +3,6 @@ import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
   BottomSheetModal,
-  BottomSheetModalProvider,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { useCallback, useRef, useState } from 'react';
@@ -91,10 +90,16 @@ export default function FilterBottomSheet({
     setTimeout(closeBottomSheet, 150);
   };
 
+  const onModalDismiss = () => {
+    setSelectedStatus(statusRef.current);
+    setSelectedGender(genderRef.current);
+  };
+
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop
         {...props}
+        onPress={onModalDismiss}
         appearsOnIndex={0}
         disappearsOnIndex={-1}
       />
@@ -102,13 +107,8 @@ export default function FilterBottomSheet({
     [],
   );
 
-  const onModalDismiss = () => {
-    setSelectedStatus(statusRef.current);
-    setSelectedGender(genderRef.current);
-  };
-
   return (
-    <BottomSheetModalProvider>
+    <>
       <AnimatedPressable
         style={animatedStyle}
         className="absolute bottom-10 right-4 rounded-full bg-white px-4 py-3 shadow-lg"
@@ -123,6 +123,7 @@ export default function FilterBottomSheet({
         ref={bottomSheetModalRef}
         backdropComponent={renderBackdrop}
         onDismiss={onModalDismiss}
+        style={{ flex: 1 }}
       >
         <BottomSheetView className="gap-6 px-5 pb-8 pt-2">
           <SelectButton
@@ -147,6 +148,6 @@ export default function FilterBottomSheet({
           />
         </BottomSheetView>
       </BottomSheetModal>
-    </BottomSheetModalProvider>
+    </>
   );
 }

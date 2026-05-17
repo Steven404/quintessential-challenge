@@ -11,6 +11,13 @@ type SearchBarProps = {
 export function SearchBar({ value, onChangeText, onClear }: SearchBarProps) {
   const [internalValue, setInternalValue] = useState<string>(value);
 
+  // this fixes the reset bug
+  useEffect(() => {
+    if (value !== internalValue) {
+      setInternalValue(value);
+    }
+  }, [value]);
+
   useEffect(() => {
     onChangeText(internalValue);
   }, [internalValue]);

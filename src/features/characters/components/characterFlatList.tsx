@@ -1,6 +1,7 @@
 import { Character } from '@/src/features/characters/characterTypes';
 import { CharacterCard } from '@/src/features/characters/components/characterCard';
 import { View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { CharacterCardSkeleton } from './characterCardSkeleton';
 
@@ -34,8 +35,10 @@ export default function CharacterFlatList(props: CharacterFlatListProps) {
         </Animated.View>
       ) : (
         <Animated.FlatList
+          renderScrollComponent={(props) => (
+            <KeyboardAwareScrollView {...props} />
+          )}
           showsVerticalScrollIndicator={false}
-          entering={FadeIn.duration(500)}
           columnWrapperClassName="w-full justify-between"
           contentContainerClassName="gap-y-6 py-[5%]"
           numColumns={2}

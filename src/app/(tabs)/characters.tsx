@@ -10,9 +10,8 @@ import {
 } from '@/src/features/characters/characterTypes';
 import CharacterFlatList from '@/src/features/characters/components/characterFlatList';
 import { debounce } from 'lodash';
-import React, { useCallback, useState } from 'react';
-import { View } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Keyboard, View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeInUp,
@@ -76,8 +75,12 @@ export default function Index() {
     setNameSearchTerm('');
   };
 
+  useEffect(() => {
+    Keyboard.dismiss();
+  }, [isError]);
+
   return (
-    <GestureHandlerRootView>
+    <>
       <View className="px-[2.5%] py-4 ">
         <SearchBar
           value={nameSearchTerm}
@@ -99,15 +102,6 @@ export default function Index() {
             onEndReached={hasNextPage ? handleOnEndReached : undefined}
             showSkeletons={isLoading || isRefetching}
           />
-          <FilterBottomSheet
-            status={status || 'Any'}
-            gender={gender || 'Any'}
-            onApply={(
-              selectedStatus: CharacterStatusFilter,
-              selectedGender: CharacterGenderFilter,
-            ) => handleApplyFilters(selectedStatus, selectedGender)}
-            onReset={handleResetFilters}
-          />
         </Animated.View>
       ) : (
         <Animated.View
@@ -123,6 +117,15 @@ export default function Index() {
           />
         </Animated.View>
       )}
-    </GestureHandlerRootView>
+      <FilterBottomSheet
+        status={status || 'Any'}
+        gender={gender || 'Any'}
+        onApply={(
+          selectedStatus: CharacterStatusFilter,
+          selectedGender: CharacterGenderFilter,
+        ) => handleApplyFilters(selectedStatus, selectedGender)}
+        onReset={handleResetFilters}
+      />
+    </>
   );
 }
