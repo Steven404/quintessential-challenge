@@ -1,6 +1,17 @@
-export type CharacterStatus = 'Alive' | 'Dead' | 'unknown';
+export const characterStatuses = ['Alive', 'Dead', 'unknown'] as const;
+export type CharacterStatus = (typeof characterStatuses)[number];
 
-export type CharacterGender = 'Female' | 'Male' | 'Genderless' | 'unknown';
+export const characterGenders = [
+  'Female',
+  'Male',
+  'Genderless',
+  'unknown',
+] as const;
+export type CharacterGender = (typeof characterGenders)[number];
+
+export type CharacterGenderFilter = CharacterGender | 'Any';
+
+export type CharacterStatusFilter = CharacterStatus | 'Any';
 
 export type CharacterPlaceReference = {
   name: string;

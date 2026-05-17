@@ -1,20 +1,48 @@
 import { apiRequest } from '@/src/utils/api';
 import { RICK_AND_MORTY_API_URL } from '@/src/utils/url';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { Character, CharactersResponse } from '../characterTypes';
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  useQuery,
+} from '@tanstack/react-query';
+import {
+  Character,
+  CharacterGender,
+  CharactersResponse,
+  CharacterStatus,
+} from '../characterTypes';
 
-const charactersUrl = (pageId: number) =>
-  `${RICK_AND_MORTY_API_URL}/character?page=${pageId}`;
+const charactersUrl = (
+  pageId: number,
+  status?: CharacterStatus,
+  gender?: CharacterGender,
+) =>
+  `${RICK_AND_MORTY_API_URL}/character?page=${pageId}${status ? `&status=${status.toLowerCase()}` : ''}${gender ? `&gender=${gender.toLowerCase()}` : ''}`;
 const singleCharacterUrl = (id: string) =>
   `${RICK_AND_MORTY_API_URL}/character/${id}`;
 
-const getCharacters = async (pageId: number) =>
-  await apiRequest<CharactersResponse>(charactersUrl(pageId));
+const getCharacters = async (
+  pageId: number,
+  status?: CharacterStatus,
+  gender?: CharacterGender,
+) =>
+  await apiRequest<CharactersResponse>(charactersUrl(pageId, status, gender));
 
-export const useCharactersReq = () =>
+export const useCharactersReq = ({
+  status,
+  gender,
+}: {
+  status?: CharacterStatus;
+  gender?: CharacterGender;
+}) =>
   useInfiniteQuery<CharactersResponse>({
-    queryKey: ['characters'],
-    queryFn: ({ pageParam = 1 }) => getCharacters(pageParam as number),
+    queryKey: ['characters', status?.toString(), gender?.toString()],
+    queryFn: ({ pageParam = 1, queryKey }) =>
+      getCharacters(
+        pageParam as number,
+        queryKey?.[1] as CharacterStatus,
+        queryKey?.[2] as CharacterGender,
+      ),
     getNextPageParam: (lastPage) => {
       if (!lastPage.info.next) return undefined;
 
@@ -24,6 +52,7 @@ export const useCharactersReq = () =>
       return parseInt(nextPage!);
     },
     initialPageParam: 1,
+    placeholderData: keepPreviousData,
   });
 
 const getCharacter = async (id: string) =>

@@ -29,7 +29,7 @@ export default function CharacterFlatList(props: CharacterFlatListProps) {
       )}
       keyExtractor={(item) => item.id.toString()}
       onEndReached={onEndReached}
-      onEndReachedThreshold={0.5}
+      onEndReachedThreshold={1}
       ListFooterComponent={
         onEndReached ? (
           <ActivityIndicator size="large" color="#3b82f6" />
