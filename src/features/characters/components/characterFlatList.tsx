@@ -26,7 +26,7 @@ export default function CharacterFlatList(props: CharacterFlatListProps) {
         <Animated.View
           entering={FadeIn.delay(300).duration(500)}
           exiting={FadeOut.duration(500)}
-          className="flex-row flex-wrap justify-between gap-y-6 px-[2.5%] py-[5%]"
+          className="flex-row flex-wrap justify-between gap-y-6 py-[5%]"
         >
           <CharacterCardSkeleton />
           <CharacterCardSkeleton />

@@ -10,8 +10,9 @@ import {
 } from '@/src/features/characters/characterTypes';
 import CharacterFlatList from '@/src/features/characters/components/characterFlatList';
 import { debounce } from 'lodash';
-import React, { useCallback, useEffect, useState } from 'react';
-import { Keyboard, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, {
   FadeIn,
   FadeInUp,
@@ -30,6 +31,7 @@ export default function Index() {
     isRefetching,
     isError,
     error,
+    refetch,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -75,9 +77,7 @@ export default function Index() {
     setNameSearchTerm('');
   };
 
-  useEffect(() => {
-    Keyboard.dismiss();
-  }, [isError]);
+  const hasFilters = Boolean(status || gender || nameSearchTerm !== '');
 
   return (
     <>
@@ -104,18 +104,23 @@ export default function Index() {
           />
         </Animated.View>
       ) : (
-        <Animated.View
-          key="error-view"
-          entering={FadeInUp.delay(500)}
-          exiting={FadeOutUp.duration(500)}
-          className="flex-1"
-        >
-          <ErrorView
-            title="Failed to load characters."
-            message={error.message || 'Please try again later.'}
-            button={{ title: 'Clear filters & retry', onPress: clearFilters }}
-          />
-        </Animated.View>
+        <KeyboardAvoidingView className="flex-1" behavior="padding">
+          <Animated.View
+            key="error-view"
+            entering={FadeInUp.delay(500)}
+            exiting={FadeOutUp.duration(500)}
+            className="flex-1"
+          >
+            <ErrorView
+              title="Failed to load characters."
+              message={error.message || 'Please try again later.'}
+              button={{
+                title: hasFilters ? 'Clear filters & retry' : 'Retry',
+                onPress: hasFilters ? clearFilters : refetch,
+              }}
+            />
+          </Animated.View>
+        </KeyboardAvoidingView>
       )}
       <FilterBottomSheet
         status={status || 'Any'}
