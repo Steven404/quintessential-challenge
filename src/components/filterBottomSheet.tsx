@@ -1,10 +1,12 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Pressable } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -49,6 +51,9 @@ export default function FilterBottomSheet({
     useState<CharacterGenderFilter>(gender);
   const pressAnim = useSharedValue(1);
 
+  const statusRef = useRef<CharacterStatusFilter>(status);
+  const genderRef = useRef<CharacterGenderFilter>(gender);
+
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: pressAnim.value }],
     opacity: pressAnim.value ** 4,
@@ -72,14 +77,34 @@ export default function FilterBottomSheet({
 
   const handleApplyPressed = () => {
     onApply(selectedStatus, selectedGender);
+    statusRef.current = selectedStatus;
+    genderRef.current = selectedGender;
     setTimeout(closeBottomSheet, 150);
   };
 
   const handleResetPressed = () => {
     setSelectedStatus('Any');
     setSelectedGender('Any');
+    statusRef.current = 'Any';
+    genderRef.current = 'Any';
     onReset();
     setTimeout(closeBottomSheet, 150);
+  };
+
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+      />
+    ),
+    [],
+  );
+
+  const onModalDismiss = () => {
+    setSelectedStatus(statusRef.current);
+    setSelectedGender(genderRef.current);
   };
 
   return (
@@ -94,7 +119,11 @@ export default function FilterBottomSheet({
         <FontAwesome name="filter" size={30} color="black" />
       </AnimatedPressable>
 
-      <BottomSheetModal ref={bottomSheetModalRef}>
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
+        backdropComponent={renderBackdrop}
+        onDismiss={onModalDismiss}
+      >
         <BottomSheetView className="gap-6 px-5 pb-8 pt-2">
           <SelectButton
             title="Status"
