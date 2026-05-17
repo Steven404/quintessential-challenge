@@ -23,13 +23,13 @@ export default function SelectButton<T extends string>({
           return (
             <Pressable
               key={option}
-              className={`flex-1 items-center border-r border-gray-200 px-2 py-3 last:border-r-0 ${
+              className={`flex-1 items-center border-r border-gray-200 px-1 py-3 last:border-r-0 ${
                 isSelected ? 'bg-blue-500' : 'bg-white'
               }`}
               onPress={() => onValueChange(option)}
             >
               <Text
-                className={`text-sm font-semibold ${
+                className={`text-xs font-semibold ${
                   isSelected ? 'text-white' : 'text-gray-700'
                 }`}
               >

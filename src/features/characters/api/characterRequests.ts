@@ -27,12 +27,10 @@ const getCharacters = async (
   status?: CharacterStatus,
   gender?: CharacterGender,
   name?: string,
-) => {
-  console.log(charactersUrl(pageId, status, gender, name));
-  return await apiRequest<CharactersResponse>(
+) =>
+  await apiRequest<CharactersResponse>(
     charactersUrl(pageId, status, gender, name),
   );
-};
 
 export const useCharactersReq = ({
   status,
