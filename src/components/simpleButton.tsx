@@ -9,7 +9,7 @@ import { wigglyConfigCard } from '../utils/animationConfigs';
 type SimpleButtonProps = {
   title: string;
   onPress: () => void;
-  type?: 'primary' | 'error';
+  type?: 'primary' | 'cancel';
 };
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -37,7 +37,7 @@ export default function SimpleButton({
   return (
     <AnimatedPressable
       className={`w-full items-center rounded-xl py-4 ${
-        type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+        type === 'cancel' ? 'bg-red-500' : 'bg-blue-500'
       }`}
       onPress={onPress}
       onPressIn={handlePressIn}

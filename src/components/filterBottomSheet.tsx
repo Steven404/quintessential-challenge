@@ -72,14 +72,14 @@ export default function FilterBottomSheet({
 
   const handleApplyPressed = () => {
     onApply(selectedStatus, selectedGender);
-    setTimeout(closeBottomSheet, 100);
+    setTimeout(closeBottomSheet, 150);
   };
 
   const handleResetPressed = () => {
     setSelectedStatus('Any');
     setSelectedGender('Any');
     onReset();
-    setTimeout(closeBottomSheet, 100);
+    setTimeout(closeBottomSheet, 150);
   };
 
   return (
@@ -113,7 +113,7 @@ export default function FilterBottomSheet({
           <SimpleButton title="Apply" onPress={handleApplyPressed} />
           <SimpleButton
             title="Reset"
-            type="error"
+            type="cancel"
             onPress={handleResetPressed}
           />
         </BottomSheetView>
