@@ -9,7 +9,6 @@ import {
 } from '@/src/features/characters/characterTypes';
 import CharacterFlatList from '@/src/features/characters/components/characterFlatList';
 import React, { useRef, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function Index() {
@@ -19,33 +18,27 @@ export default function Index() {
   const {
     data,
     isLoading,
-    isFetching,
+    isRefetching,
     isError,
     error,
     fetchNextPage,
     hasNextPage,
+    refetch,
   } = useCharactersReq({ status, gender });
-
-  if (isLoading) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" color="#3b82f6" />
-      </View>
-    );
-  }
 
   if (isError) {
     return (
       <ErrorView
         title="Failed to load characters."
         message={error?.message || 'Please try again later.'}
+        button={{ title: 'Retry', onPress: () => refetch() }}
       />
     );
   }
 
   const characters = data?.pages.flatMap((page) => page.results); // page.results is an array of arrays, so we need to flatten it
 
-  if (!characters?.length) {
+  if (!characters?.length && !isLoading && !isRefetching) {
     return <ErrorView message="No characters found" />;
   }
 
@@ -74,11 +67,13 @@ export default function Index() {
   };
 
   return (
-    <GestureHandlerRootView className="flex-1">
+    <GestureHandlerRootView>
       <CharacterFlatList
-        characters={characters}
+        key={`${status}-${gender}`} // this will force a re-render when the filters are changed, fastest way to reset scroll position
+        characters={characters || []}
         isInitialRender={true}
         onEndReached={hasNextPage ? handleOnEndReached : undefined}
+        showSkeletons={isLoading || isRefetching}
       />
       <FilterBottomSheet
         status={status || 'Any'}

@@ -54,8 +54,8 @@ export function CharacterCard({
       className="max-w-[48.5%] flex-1 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
       // entering={enteringAnimation}
       // exiting={exitingAnimation}
-      exiting={FadeOut}
       entering={FadeIn}
+      exiting={FadeOut}
     >
       <Pressable
         onPressIn={handlePressIn}
