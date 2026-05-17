@@ -61,10 +61,11 @@ export default function CharacterScreen() {
         <Feather name="chevron-left" size={28} color="white" />
       </TouchableOpacity>
       {loading ? (
-        <CharacterPageSkeleton />
+        <CharacterPageSkeleton key={'skeleton'} />
       ) : (
         character && (
           <Animated.ScrollView
+            key={character.id}
             className="flex-1"
             bounces={false}
             entering={FadeIn.duration(500)}
