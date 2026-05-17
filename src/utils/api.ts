@@ -5,17 +5,19 @@ export async function apiRequest<T>(
   try {
     const response = await fetch(url, options);
 
-    if (!response.ok) {
-      const errorData = await response.json();
+    const responeseJson = await response.json();
 
+    if (!response.ok || responeseJson?.error) {
       throw {
-        message: errorData.message || 'Something went wrong',
+        message:
+          responeseJson?.message ||
+          responeseJson?.error ||
+          'Something went wrong',
         status: response.status,
-        ...errorData,
       };
     }
 
-    return await response.json();
+    return responeseJson;
   } catch (error) {
     throw error;
   }
