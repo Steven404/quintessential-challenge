@@ -1,4 +1,3 @@
-import { useFavoritesContext } from '@/src/hooks/favoritesContext';
 import { wigglyConfigCard } from '@/src/utils/animationConfigs';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -24,19 +23,17 @@ export function CharacterCard({
   index,
   isInitialRender = false,
 }: CharacterCardProps) {
-  const { addFavorite, removeFavorite, favorites } = useFavoritesContext();
   const router = useRouter();
 
-  const enteringAnimation = isInitialRender
-    ? FadeIn.delay((index % 20) * 150) // added modulo 20 to compensate for useInfiniteQuery usage
-    : FadeIn;
+  // const enteringAnimation = isInitialRender
+  //   ? FadeIn.delay((index % 20) * 150) // added modulo 20 to compensate for useInfiniteQuery usage
+  //   : FadeIn;
   // const exitingAnimation = FadeOut.duration(500).delay(index * 150); not sure if I want this after all
 
   const pressAnim = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: pressAnim.value }],
-    // opacity: pressAnim.value ** 4,
   }));
 
   const handlePressIn = () => {
@@ -55,9 +52,10 @@ export function CharacterCard({
     <Animated.View
       style={animatedStyle}
       className="max-w-[48.5%] flex-1 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
-      entering={enteringAnimation}
+      // entering={enteringAnimation}
       // exiting={exitingAnimation}
       exiting={FadeOut}
+      entering={FadeIn}
     >
       <Pressable
         onPressIn={handlePressIn}
