@@ -16,8 +16,9 @@ const charactersUrl = (
   pageId: number,
   status?: CharacterStatus,
   gender?: CharacterGender,
+  name?: string,
 ) =>
-  `${RICK_AND_MORTY_API_URL}/character?page=${pageId}${status ? `&status=${status.toLowerCase()}` : ''}${gender ? `&gender=${gender.toLowerCase()}` : ''}`;
+  `${RICK_AND_MORTY_API_URL}/character?page=${pageId}${status ? `&status=${status.toLowerCase()}` : ''}${gender ? `&gender=${gender.toLowerCase()}` : ''}${name ? `&name=${name}` : ''}`;
 const singleCharacterUrl = (id: string) =>
   `${RICK_AND_MORTY_API_URL}/character/${id}`;
 
@@ -25,23 +26,36 @@ const getCharacters = async (
   pageId: number,
   status?: CharacterStatus,
   gender?: CharacterGender,
-) =>
-  await apiRequest<CharactersResponse>(charactersUrl(pageId, status, gender));
+  name?: string,
+) => {
+  console.log(charactersUrl(pageId, status, gender, name));
+  return await apiRequest<CharactersResponse>(
+    charactersUrl(pageId, status, gender, name),
+  );
+};
 
 export const useCharactersReq = ({
   status,
   gender,
+  name,
 }: {
   status?: CharacterStatus;
   gender?: CharacterGender;
+  name?: string;
 }) =>
   useInfiniteQuery<CharactersResponse>({
-    queryKey: ['characters', status?.toString(), gender?.toString()],
+    queryKey: [
+      'characters',
+      status?.toString().toLowerCase(),
+      gender?.toString().toLowerCase(),
+      name?.toString().toLowerCase(),
+    ],
     queryFn: ({ pageParam = 1, queryKey }) =>
       getCharacters(
         pageParam as number,
         queryKey?.[1] as CharacterStatus,
         queryKey?.[2] as CharacterGender,
+        queryKey?.[3] as string,
       ),
     getNextPageParam: (lastPage) => {
       if (!lastPage.info.next) return undefined;
@@ -53,6 +67,7 @@ export const useCharactersReq = ({
     },
     initialPageParam: 1,
     placeholderData: keepPreviousData,
+    retry: 0,
   });
 
 const getCharacter = async (id: string) =>

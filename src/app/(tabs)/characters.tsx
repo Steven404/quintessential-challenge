@@ -1,5 +1,6 @@
 import ErrorView from '@/src/components/errorView';
 import FilterBottomSheet from '@/src/components/filterBottomSheet';
+import { SearchBar } from '@/src/components/searchBar';
 import { useCharactersReq } from '@/src/features/characters/api/characterRequests';
 import {
   CharacterGender,
@@ -8,13 +9,22 @@ import {
   CharacterStatusFilter,
 } from '@/src/features/characters/characterTypes';
 import CharacterFlatList from '@/src/features/characters/components/characterFlatList';
-import React, { useRef, useState } from 'react';
+import { debounce } from 'lodash';
+import React, { useCallback, useState } from 'react';
+import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Animated, {
+  FadeIn,
+  FadeInUp,
+  FadeOut,
+  FadeOutUp,
+} from 'react-native-reanimated';
 
 export default function Index() {
-  const fetchNextPageTimeout = useRef<NodeJS.Timeout | null>(null);
   const [status, setStatus] = useState<CharacterStatus | undefined>(undefined);
   const [gender, setGender] = useState<CharacterGender | undefined>(undefined);
+  const [nameSearchTerm, setNameSearchTerm] = useState<string>('');
+
   const {
     data,
     isLoading,
@@ -23,34 +33,28 @@ export default function Index() {
     error,
     fetchNextPage,
     hasNextPage,
-    refetch,
-  } = useCharactersReq({ status, gender });
+    isFetchingNextPage,
+    isFetching,
+  } = useCharactersReq({ status, gender, name: nameSearchTerm });
 
-  if (isError) {
-    return (
-      <ErrorView
-        title="Failed to load characters."
-        message={error?.message || 'Please try again later.'}
-        button={{ title: 'Retry', onPress: () => refetch() }}
-      />
-    );
-  }
+  const searchBarOnChangeText = useCallback(
+    debounce((text: string) => {
+      setNameSearchTerm(text);
+    }, 500),
+    [],
+  );
 
   const characters = data?.pages.flatMap((page) => page.results); // page.results is an array of arrays, so we need to flatten it
 
-  if (!characters?.length && !isLoading && !isRefetching) {
+  if (!characters?.length && !isLoading && !isRefetching && !isError) {
     return <ErrorView message="No characters found" />;
   }
 
   const handleOnEndReached = () => {
-    if (fetchNextPageTimeout.current) {
+    if (!hasNextPage || isFetchingNextPage || isFetching) {
       return;
     }
-
-    fetchNextPageTimeout.current = setTimeout(() => {
-      fetchNextPage();
-      fetchNextPageTimeout.current = null;
-    }, 500);
+    fetchNextPage();
   };
 
   const handleApplyFilters = (
@@ -66,24 +70,59 @@ export default function Index() {
     setGender(undefined);
   };
 
+  const clearFilters = () => {
+    setStatus(undefined);
+    setGender(undefined);
+    setNameSearchTerm('');
+  };
+
   return (
     <GestureHandlerRootView>
-      <CharacterFlatList
-        key={`${status}-${gender}`} // this will force a re-render when the filters are changed, fastest way to reset scroll position
-        characters={characters || []}
-        isInitialRender={true}
-        onEndReached={hasNextPage ? handleOnEndReached : undefined}
-        showSkeletons={isLoading || isRefetching}
-      />
-      <FilterBottomSheet
-        status={status || 'Any'}
-        gender={gender || 'Any'}
-        onApply={(
-          selectedStatus: CharacterStatusFilter,
-          selectedGender: CharacterGenderFilter,
-        ) => handleApplyFilters(selectedStatus, selectedGender)}
-        onReset={handleResetFilters}
-      />
+      <View className="px-[2.5%] py-4 ">
+        <SearchBar
+          value={nameSearchTerm}
+          onChangeText={(text) => searchBarOnChangeText(text)}
+          onClear={() => setNameSearchTerm('')}
+        />
+      </View>
+      {!isError ? (
+        <Animated.View
+          key="characters-list"
+          className="flex-1"
+          entering={FadeIn.delay(500)}
+          exiting={FadeOut.duration(500)}
+        >
+          <CharacterFlatList
+            key={`${status}-${gender}-${nameSearchTerm}`} // this will force a re-render when the filters are changed, fastest way to reset scroll position
+            characters={characters || []}
+            isInitialRender={true}
+            onEndReached={hasNextPage ? handleOnEndReached : undefined}
+            showSkeletons={isLoading || isRefetching}
+          />
+          <FilterBottomSheet
+            status={status || 'Any'}
+            gender={gender || 'Any'}
+            onApply={(
+              selectedStatus: CharacterStatusFilter,
+              selectedGender: CharacterGenderFilter,
+            ) => handleApplyFilters(selectedStatus, selectedGender)}
+            onReset={handleResetFilters}
+          />
+        </Animated.View>
+      ) : (
+        <Animated.View
+          key="error-view"
+          entering={FadeInUp.delay(500)}
+          exiting={FadeOutUp.duration(500)}
+          className="flex-1"
+        >
+          <ErrorView
+            title="Failed to load characters."
+            message={error.message || 'Please try again later.'}
+            button={{ title: 'Clear filters & retry', onPress: clearFilters }}
+          />
+        </Animated.View>
+      )}
     </GestureHandlerRootView>
   );
 }

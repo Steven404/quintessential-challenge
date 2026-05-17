@@ -20,7 +20,7 @@ export default function CharacterFlatList(props: CharacterFlatListProps) {
   } = props;
 
   return (
-    <View>
+    <View className="flex-1 px-[2.5%]">
       {showSkeletons ? (
         <Animated.View
           entering={FadeIn.delay(300).duration(500)}
@@ -37,7 +37,7 @@ export default function CharacterFlatList(props: CharacterFlatListProps) {
           showsVerticalScrollIndicator={false}
           entering={FadeIn.duration(500)}
           columnWrapperClassName="w-full justify-between"
-          contentContainerClassName="gap-y-6 py-[5%] px-[2.5%]"
+          contentContainerClassName="gap-y-6 py-[5%]"
           numColumns={2}
           data={characters}
           renderItem={({ item, index }) => (
@@ -49,7 +49,7 @@ export default function CharacterFlatList(props: CharacterFlatListProps) {
           )}
           keyExtractor={(item) => item.id.toString()}
           onEndReached={onEndReached}
-          onEndReachedThreshold={0.25}
+          onEndReachedThreshold={0.5}
           ListFooterComponent={
             onEndReached ? (
               <View className="flex-row justify-between">
